@@ -44,9 +44,11 @@ module DirichletMixtureModels
         DMMState,
 
         dp_cluster,
+        summarize,
         pdf_likelihood,
         sample_posterior,
-        marginal_likelihood
+        marginal_likelihood,
+        to_string
 
 
     include("./package_overrides.jl")

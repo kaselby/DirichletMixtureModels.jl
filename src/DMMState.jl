@@ -164,6 +164,28 @@ function cleanup!(state::DMMState)
   end
 end
 
+
+#
+# Summarize cluster data
+#
+
+function summarize(model::AbstractMixtureModel, s::DMMState, max_out=10)
+  K=collect(keys(s.n))
+  N=length(K)
+  println("Total Clusters: $N")
+  for i in 1:min(N, max_out)
+    k=K[i]
+    v=s.n[k]
+    println("Cluster $i:")
+    println("\tCluster Size: $v")
+    println("\tCluster Parameters: " * to_string(model, s.ϕ[k]))
+  end
+  if N > max_out
+    println("...")
+  end
+end
+
+
 #
 # Check if two numbers are equal (within relative error ϵ)
 #

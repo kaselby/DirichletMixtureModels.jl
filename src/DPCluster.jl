@@ -39,7 +39,7 @@ function dp_cluster(Y::Array{Float64,1}, model::UnivariateConjugateModel, α::Fl
   if shuffled
     states = shuffle!(states)
   end
-  return state
+  return states
 end
 function dp_cluster(Y::Array{Float64,2}, model::MultivariateConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
   # Initialize the array of states
@@ -67,7 +67,7 @@ function dp_cluster(Y::Array{Float64,2}, model::MultivariateConjugateModel, α::
   if shuffled
     states = shuffle!(states)
   end
-  return state
+  return states
 end
 
 #
