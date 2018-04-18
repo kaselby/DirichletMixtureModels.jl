@@ -7,13 +7,16 @@ Currently, the package only supports clustering using conjugate distributions us
 There will also be an R package linked to this for using these utilities from R. Information on that will be added shortly.
 
 ## Getting Started
-To install the package simply run the following in the Julia REPL:
+### Prerequisites
+This package uses Julia v0.6, as well as the Distributions and ConjugatePriors packages for Julia. See REQUIRE for details.
 
+###Installation
+To install the package, simply run the following in the Julia REPL:
 ```
  Pkg.clone(https://github.com/krylea/DirichletMixtureModels.jl)
 ```
 
-
+###Basic Usage
 To use the utilities in the package, the first thing you need to do is define a model.
 We provide a number of conjugate models in the src/models folder.
 
@@ -37,8 +40,7 @@ Suppose I wanted to take a random draw and see a summary of the clusters for tha
 ```
 This will print a summary of the clusters in the first state in the list. Note that by default the states are randomized so that they may be used as IID draws.
 
-### Prerequisites
-See REQUIRE.
+
 
 ## Authors
 
