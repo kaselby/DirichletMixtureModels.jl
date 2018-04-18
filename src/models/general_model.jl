@@ -1,3 +1,7 @@
+#
+#   For use with R package
+#
+
 
 struct GeneralUnivariateConjugateModel <: UnivariateConjugateModel
     marginal_likelihood::Function
@@ -43,12 +47,4 @@ function sample_posterior(model::GeneralMultivariateConjugateModel, y::Union{Arr
 end
 function marginal_likelihood(model::GeneralMultivariateConjugateModel, y::Array{Float64,1})
     model.marginal_likelihood(y,marg_params...)
-end
-
-function import_julia_model(jl_file::String, marg_params::Tuple, pdf_params::Tuple, post_params::Tuple)
-    
-end
-
-function import_r_model()
-
 end

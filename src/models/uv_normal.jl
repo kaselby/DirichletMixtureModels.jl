@@ -1,8 +1,27 @@
+"""
+    UnivariateNormalKnownSigma(prior, σ)
+This is the base type for the model with `NormalKnownSigma` likelihood and
+`Normal` prior.
+
+```julia
+UnivariateNormalKnownSigma(prior, σ)    # Creates a model with a given Normal
+                                        # prior and fixed variance σ
+UnivariateNormalKnownSigma(μ0, σ0, σ)   # Creates a model with prior mean μ0,
+                                        # prior variance σ0 and fixed likelihood
+                                        # variance σ
+UnivariateNormalKnownSigma(ss, σ)       # Creates a model with prior hyper-
+                                        # -parameters inferred from the data
+                                        # using a NormalStats object
+```
+"""
 struct UnivariateNormalKnownSigma <: UnivariateConjugateModel
   prior::Normal
   σ::Float64
 end
 
+function UnivariateNormalKnownSigma(μ0::Float64, σ0::Float64, σ::Float64)
+  UnivariateNormalKnownSigma(Normal(μ0, σ0), σ)
+end
 function UnivariateNormalKnownSigma(ss::NormalStats, σ::Float64)
   p=Normal(ss.m,ss.s2/ss.tw)
   UnivariateNormalKnownSigma(p, σ)
@@ -30,11 +49,28 @@ end
 #
 # Utility functions for clustering with univariate normal likelihood (mean and precision unknown)
 #
+"""
+    UnivariateNormalModel(prior)
+This is the base type for the model with `Normal` likelihood and `NormalGamma`
+prior. This is the most commonly used 1D model.
 
+```julia
+UnivariateNormalModel(prior)    # Creates a model with a given NormalGamma prior
+UnivariateNormalModel(ss)       # Creates a model with prior mean μ0,
+                                  # prior variance σ0 and fixed likelihood
+                                  # variance σ
+UnivariateNormalModel()           # Creates a model with prior hyper-
+                                  # -parameters inferred from the data
+                                  # using a NormalStats object
+```
+"""
 struct UnivariateNormalModel <: UnivariateConjugateModel
   prior::NormalGamma
 end
 
+function UnivariateNormalModel(μ0::Float64, n0::Float64, α0::Float64, β0::Float64)
+  UnivariateNormalModel(NormalGamma(μ0, n0, α0, β0))
+end
 function UnivariateNormalModel(ss::NormalStats)
   p=NormalGamma(ss.m,1e-8,2.0,0.5)
   UnivariateNormalModel(p)

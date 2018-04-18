@@ -1,47 +1,29 @@
-#
-# Dirichlet Mixture Models
-#
-# By Kira Selby
-#
 
-#
-# This file contains the functions for performing the clustering algorithms
-# themselves, using the utilities defined elsewhere. The clustering is done
-# according to the algorithms in Neal (2000). To use the functions defined here,
-# either pass in a model from one of the types defined in the models folder or
-# define your own model in a similar fashion. Then, invoke DPCluster with your
-# your data, the model, and a value for the concentration parameter α
-#
+"""
+    dp_cluster(Y, model, α, iters=5000, burnin=200, shuffled=true)
+Performs `iters` iterations of Algorithm 2 from Neal(2000) to generate possible
+clusters for the data in `Y`, using the model in `model`, with concentration
+parameter `alpha`. In the 1D case, Y is assumed to be a 1D array of floats. In
+the 2D case, `Y` is assumed to be a dxN array of floats, where the data is
+d-dimensional and N is the number of datapoints.
+Returns a 1D array of DMMState objects. This includes the states after each
+post-burnin iteration, with the default being a burnin of 200. By default, this
+array is shuffled so that it may be used to approximate I.I.D draws from the
+posterior.
+To see a formatted summary of all the clusters in a given state, call
+`summarize(model, state)`, where state is any entry from the outputted list.
+"""
+function dp_cluster(Y, model, α; iters=5000, burnin=200, shuffled=true) end
 
-#
-# Clustering over class labels using Algorithm 2 from Neal(2000).
-#
-
+# Methods (to enforce proper typing)
 function dp_cluster(Y::Array{Float64,1}, model::UnivariateConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
-  states = Array{DMMState, 1}(iters-burnin)
-
-  # Initialize the clusters, returning c and phi
-  state::DMMState = DMMState(Y,model)
-
-  # Iterate
-  for i in 1:iters
-    # Iterate through all Y and update
-    state = sample_Y(state,model,α)
-
-    # Iterate through all ϕ and update
-    for k in keys(state.ϕ)
-      state.ϕ[k] = sample_posterior(model,state.Y[k])
-    end
-    if i > burnin
-      states[i-burnin] = state
-    end
-  end
-  if shuffled
-    states = shuffle!(states)
-  end
-  return states
+  _dp_cluster(Y, model, α, iters, burnin, shuffled)
 end
 function dp_cluster(Y::Array{Float64,2}, model::MultivariateConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
+  _dp_cluster(Y, model, α, iters, burnin, shuffled)
+end
+
+function _dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64, iters::Int64, burnin::Int64, shuffled::Bool)
   # Initialize the array of states
   states = Array{DMMState, 1}(iters-burnin)
 
@@ -74,6 +56,14 @@ end
 # Iterate over all data points in the state, drawing a new cluster for each.
 # Returns a new state object.
 #
+
+"""
+  sample_Y(state, model, α)
+Iterates through each data point in the given `DMMState` object, drawing a new
+cluster for each.
+Returns a new state object.
+"""
+function sample_Y(state, model, α) end
 
 function sample_Y(state::DMMState, model::UnivariateConjugateModel, α::Float64)
   N=sum(values(state.n))
