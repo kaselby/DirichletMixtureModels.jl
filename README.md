@@ -53,6 +53,11 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
+## Further Information
+
+If you would like further information on Dirichlet Processes, Dirichlet mixture models,
+or the derivations of any of the conjugate models used in this package, see the sources linked in the 'resources' folder.
+
 ## Acknowledgments
 
 * Dr. Radford M. Neal for his wonderful paper on Dirichlet Process mixture models.
