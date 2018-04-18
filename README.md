@@ -13,7 +13,7 @@ This package uses Julia v0.6, as well as the Distributions and ConjugatePriors p
 ### Installation
 To install the package, simply run the following in the Julia REPL:
 ```
- Pkg.clone(https://github.com/krylea/DirichletMixtureModels.jl)
+ Pkg.clone("https://github.com/krylea/DirichletMixtureModels.jl")
 ```
 
 ### Basic Usage

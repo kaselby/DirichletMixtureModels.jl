@@ -44,9 +44,6 @@ function marginal_likelihood(model::MultivariateNormalModel, y::Array{Float64,1}
 
   exp(-d/2*log(π) + logmvgamma(d,nu/2) - logmvgamma(d,nu0/2) + nu0/2*logdet(TC0) - nu/2*logdet(Lam) + d/2 * (log(kappa0) - log(kappa)))
 end
-function standard_form(model::MultivariateNormalModel, ϕ::Tuple{Float64, Float64})
-  (ϕ[1], inv(ϕ[2]))
-end
 function to_string(model::MultivariateNormalModel, ϕ::Tuple{Array{Float64,1}, Array{Float64,2}})
   "Mean: $(ϕ[1]), Covariance Matrix: $(inv(ϕ[2]))"
 end
