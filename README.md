@@ -10,13 +10,13 @@ There will also be an R package linked to this for using these utilities from R.
 ### Prerequisites
 This package uses Julia v0.6, as well as the Distributions and ConjugatePriors packages for Julia. See REQUIRE for details.
 
-###Installation
+### Installation
 To install the package, simply run the following in the Julia REPL:
 ```
  Pkg.clone(https://github.com/krylea/DirichletMixtureModels.jl)
 ```
 
-###Basic Usage
+### Basic Usage
 To use the utilities in the package, the first thing you need to do is define a model.
 We provide a number of conjugate models in the src/models folder.
 
