@@ -61,40 +61,38 @@ function sample_Y(state::DMMState, model::ConjugateModel, α::Float64)
   for k in keys(state.Y)
     for j in state.Y[k]
       nextstate.n[k] -= 1
-      _sample_y(j, nextstate, model, α, N, K)
+      _sample_y!(j, nextstate, model, α, N, K)
     end
   end
   cleanup!(nextstate)
   return nextstate
 end
 
-function sampleY(state::DMMState, model::NonConjugateModel, α::Float64, m::Int64)
+
+function sample_Y(state::DMMState, model::NonConjugateModel, α::Float64, m::Int64)
   N=sum(values(state.n))
-  K=keys(state.n)
+  K=collect(keys(state.n))
+  L = length(K)
   nextstate = DMMState(state)
 
   aux=Array{Tuple}(m)
   for (k,v) in state.n
-    if v == 1
-      nextstate.n[k] -= 1
-      y=get_data(state.data, j)
-      aux[1] = s.ϕ[k]
-      for i=2:m
-        aux[i] = sample_prior(model)
-      end
-      qprev=[pdf_likelihood(model, y, nextstate.ϕ[k])*nextstate.n[k]/(N-1+α) for k in K]
-      qaux=[pdf_likelihood(model, y, θ)*α/m/(N-1+α) for θ in aux]
-
-    else
-      for i=1:m
-        aux[i] = sample_prior(model)
-      end
-    end
+      for j=1:v
+          nextstate.n[k] -= 1
+          for i=1:m
+              if (v==1) & (i==1)
+                  aux[1] = s.ϕ[k]
+              else
+                  aux[i] = sample_prior(model)
+              end
+          end
+      _sample_y!(nextstate, state.Y[k][j], aux, model, α, m, N, K, L)
   end
+  cleanup!(nextstate)
   return nextstate
 end
 
-function _sample_y(j::Int64, nextstate::DMMState, model::ConjugateModel, α::Float64, N::Int64, K::Array{Int64,1})
+function _sample_y!(j::Int64, nextstate::DMMState, model::ConjugateModel, α::Float64, N::Int64, K::Array{Int64,1})
   yj = get_data(nextstate.data, j)
 
   q=[pdf_likelihood(model,yj,nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
@@ -117,4 +115,33 @@ function _sample_y(j::Int64, nextstate::DMMState, model::ConjugateModel, α::Flo
       end
     end
   end
+end
+
+function _sample_y!(nextstate::DMMState, j::Int64, aux::Array{Tuple}, model::NonConjugateModel, α::Float64, m::Int64, N::Int64, K::Array{Int64,1}, L::Int64)
+    y=get_data(state.data, j)
+
+    # Get likelihood probabilities
+    q_prev=[pdf_likelihood(model, y, nextstate.ϕ[k])*nextstate.n[k]/(N-1+α) for k in K]
+    q_aux=[pdf_likelihood(model, y, θ)*α/m/(N-1+α) for θ in aux]
+    b = sum(q_prev) + sum(q_aux)
+    q_prev = q_prev/b
+    q_aux = q_aux/b
+
+    rd=rand()
+    p=0
+    for i in 1:(L+m)
+        if i <= L
+            p += q_prev[i]
+            if rd < p
+              addto!(nextstate, j, K[i])
+              break
+            end
+        else
+            p += q_aux[i-L]
+            if rd < p
+              addnew!(nextstate, j, aux[i-L])
+              break
+            end
+        end
+    end
 end

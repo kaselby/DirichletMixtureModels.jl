@@ -58,30 +58,29 @@ function DMMState(s::DMMState)
   return DMMState(s.data, s.ϕ,Dict{Int64,Array{Float64}}(), s.n)
 end
 
-function DMMState(data::Array{Float64,1}, model::ConjugateModel)
+function DMMState(data::Array{Float64}, model::ConjugateModel)
   N=length(data)
   ϕ=Dict{Int64,Tuple}()
   Y=Dict{Int64,Array{Int64,1}}()
   n=Dict{Int64,Int64}()
   for i in 1:N
-    ϕ[i] = sample_posterior(model,data[i])
+    ϕ[i] = sample_posterior(model,get_data(data,[i]]))
     Y[i] = [i]
     n[i] = 1
   end
   return DMMState(data,ϕ,Y,n)
 end
-function DMMState(data::Array{Float64,2}, model::ConjugateModel)
-  d,N=size(data)
-  ϕ=Dict{Int64,Tuple}()
-  Y=Dict{Int64,Array{Int64,1}}()
-  n=Dict{Int64,Int64}()
-  for i in 1:N
-    ϕ[i] = sample_posterior(model,data[:,i:i])
-    Y[i] = [i]
-    n[i] = 1
-  end
-  return DMMState(data,ϕ,Y,n)
-end
+
+"""
+  get_data(Y, I)
+Assembles data points from `Y` indexed by `I`, where Y can be a vector or matrix
+and I can be a single index or an indexing set.
+"""
+function get_data(Y, I) end
+
+get_data(Y::Array{Float64, 1}, I::Union{Int64, Array{Int64,1}})=Y[I]
+get_data(Y::Array{Float64,2}, I::Union{Int64, Array{Int64,1}})=Y[:,I]
+
 
 #
 # Add new data to the state (when the label is completely unknown)
@@ -171,17 +170,6 @@ function addto!(state::DMMState, j::Int64, i::Int64)
     state.Y[i] = [j]
   end
 end
-
-"""
-  get_data(Y, I)
-Assembles data points from `Y` indexed by `I`, where Y can be a vector or matrix
-and I can be a single index or an indexing set.
-"""
-function get_data(Y, I) end
-
-get_data(Y::Array{Float64, 1}, I::Union{Int64, Array{Int64,1}})=Y[I]
-get_data(Y::Array{Float64,2}, I::Union{Int64, Array{Int64,1}})=Y[:,I]
-
 
 
 #
