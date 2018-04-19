@@ -45,8 +45,8 @@ end
 function standard_form(model::UnivariateNormalKnownSigma, ϕ::Tuple{Float64})
   (ϕ[1], model.σ)
 end
-function to_string(model::UnivariateNormalKnownSigma, ϕ::Tuple{Float64})
-  "Mean: $(ϕ[1]), Variance: $(model.σ)"
+function parameter_names(model::UnivariateNormalKnownSigma)
+  ("Mean", "Stdev")
 end
 
 #
@@ -104,6 +104,6 @@ end
 function standard_form(model::UnivariateNormalModel, ϕ::Tuple{Float64,Float64})
   (ϕ[1], 1/sqrt(ϕ[2]))
 end
-function to_string(model::UnivariateNormalModel, ϕ::Tuple{Float64, Float64})
-  "Mean: $(ϕ[1]), Variance: $(1/sqrt(ϕ[2]))"
+function parameter_names(model::UnivariateNormalModel)
+  ("Mean", "Stdev")
 end

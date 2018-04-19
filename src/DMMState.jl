@@ -189,32 +189,6 @@ function cleanup!(state::DMMState)
 end
 
 
-#
-# Summarize cluster data
-#
-"""
-    summarize(model, state)
-Prints a summary of the clusters from a given `DMMState` object, assuming it was
-generated from the given `model`.
-"""
-function summarize(model::AbstractMixtureModel, s::DMMState, max_out=10)
-  K=collect(keys(s.n))
-  N=length(K)
-  println("Total Clusters: $N")
-  for i in 1:min(N, max_out)
-    k=K[i]
-    v=s.n[k]
-    println("Cluster $i:")
-    println("\tCluster Size: $v")
-    println("\tCluster Parameters: " * to_string(model, s.ϕ[k]))
-  end
-  if N > max_out
-    println("...")
-  end
-end
-
-
-
 """
     isequalϵ(a,b,ϵ=1e-6)
 Checks if two numbers, arrays, or tuples thereof are equal to within relative

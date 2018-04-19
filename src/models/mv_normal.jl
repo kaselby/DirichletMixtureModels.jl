@@ -66,6 +66,6 @@ end
 function standard_form(model::MultivariateNormalModel, ϕ::Tuple{Array{Float64,1}, Array{Float64,2}})
   (ϕ[1], inv(ϕ[2]))
 end
-function to_string(model::MultivariateNormalModel, ϕ::Tuple{Array{Float64,1}, Array{Float64,2}})
-  "Mean: $(ϕ[1]), Covariance Matrix: $(inv(ϕ[2]))"
+function parameter_names(model::MultivariateNormalModel)
+  ("Mean", "Covariance Matrix")
 end

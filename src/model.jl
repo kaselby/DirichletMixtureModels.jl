@@ -22,16 +22,21 @@ Evaluates the likelihood for the model at y, marginalized over all values of the
 parameters θ.
 """
 function marginal_likelihood(model::AbstractMixtureModel, y::Union{Float64, Array{Float64}}) end
+"""
+    standard_form(model, ϕ)
+Converts the given parameters for the model into standard form. This is an optional
+method that is used solely for formatting the output of the MCMC.
+"""
 function standard_form(model::AbstractMixtureModel, ϕ::Tuple)
   ϕ
 end
 """
-    to_string(model, ϕ)
-Converts the parameters for a given cluster in the model to a string. This
-is an optional method that is used solely for formatting the output of the MCMC.
+    parameter_names(model)
+Returns the names for the model parameters (in standard form). This is an optional
+method that is used solely for formatting the output of the MCMC.
 """
-function to_string(model::AbstractMixtureModel, ϕ::Tuple)
-    return string(ϕ)
+function parameter_names(model::AbstractMixtureModel)
+    return ()
 end
 
 

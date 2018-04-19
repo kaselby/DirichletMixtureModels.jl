@@ -16,3 +16,6 @@ function marginal_likelihood(model::UnivariateExponentialModel, y::Float64)
   M=model.prior
   M.α*(M.θ) / (1+y*M.θ)^(M.α+1)
 end
+function parameter_names(model::UnivariateExponentialModel)
+  ("scale")
+end
