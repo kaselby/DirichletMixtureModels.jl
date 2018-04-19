@@ -42,6 +42,9 @@ function marginal_likelihood(model::UnivariateNormalKnownSigma, y::Float64)
   tau = (model.σ^2 + model.prior.σ^2)^(1/2)
   pdf(Normal(model.prior.μ, tau), y)
 end
+function standard_form(model::UnivariateNormalKnownSigma, ϕ::Tuple{Float64})
+  (ϕ[1], model.σ)
+end
 function to_string(model::UnivariateNormalKnownSigma, ϕ::Tuple{Float64})
   "Mean: $(ϕ[1]), Variance: $(model.σ)"
 end
@@ -53,6 +56,8 @@ end
     UnivariateNormalModel(prior)
 This is the base type for the model with `Normal` likelihood and `NormalGamma`
 prior. This is the most commonly used 1D model.
+Note that the `NormalGamma` distribution used in this package uses the shape/
+rate parametrization.
 
 ```julia
 UnivariateNormalModel(prior)          # Creates a model with a given NormalGamma prior.
@@ -95,6 +100,9 @@ function marginal_likelihood(model::UnivariateNormalModel, y::Float64)
   p=model.prior
   gamma(p.shape+1/2)/gamma(p.shape) * sqrt(p.nu/(p.nu+1)) * 1/sqrt(2*π) * p.rate^p.shape /
     (p.rate+p.nu/2/(p.nu+1)*(y-p.mu)^2)^(p.shape+1/2)
+end
+function standard_form(model::UnivariateNormalModel, ϕ::Tuple{Float64,Float64})
+  (ϕ[1], 1/sqrt(ϕ[2]))
 end
 function to_string(model::UnivariateNormalModel, ϕ::Tuple{Float64, Float64})
   "Mean: $(ϕ[1]), Variance: $(1/sqrt(ϕ[2]))"

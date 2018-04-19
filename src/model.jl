@@ -22,6 +22,9 @@ Evaluates the likelihood for the model at y, marginalized over all values of the
 parameters θ.
 """
 function marginal_likelihood(model::AbstractMixtureModel, y::Union{Float64, Array{Float64}}) end
+function standard_form(model::AbstractMixtureModel, ϕ::Tuple)
+  ϕ
+end
 """
     to_string(model, ϕ)
 Converts the parameters for a given cluster in the model to a string. This
