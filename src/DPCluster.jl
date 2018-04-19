@@ -39,7 +39,7 @@ function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters
   if shuffled
     states = shuffle!(states)
   end
-  return states
+  export_states(model, states)
 end
 
 function dp_cluster(Y::Array{Float64}, model::NonConjugateModel, α::Float64; m_prior::Int64=3, m_post::Int64=3, iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
@@ -68,7 +68,7 @@ function dp_cluster(Y::Array{Float64}, model::NonConjugateModel, α::Float64; m_
   if shuffled
     states = shuffle!(states)
   end
-  return states
+  export_states(model, states)
 end
 
 

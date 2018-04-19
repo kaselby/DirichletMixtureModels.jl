@@ -283,7 +283,7 @@ function OutputState(model::AbstractMixtureModel, s::DMMState)
   n=Array{Int64,1}(m)
   for i in 1:m
     k=K[i]
-    ϕ[i]=model.standard_form(s.ϕ[k])
+    ϕ[i]=standard_form(model, s.ϕ[k])
     n[i]=s.n[k]
     labels[s.Y[k]]=i
   end
@@ -296,9 +296,9 @@ Creates a list of `OutputState` objects from a list of `DMMState` objects.
 """
 function export_states(model::AbstractMixtureModel, s::Array{DMMState,1})
   M=length(s)
-  states=Array{OutputState, 1}
+  states=Array{OutputState, 1}(M)
   for j in 1:M
-    states[j] = OutputState(s[j])
+    states[j] = OutputState(model, s[j])
   end
   states
 end

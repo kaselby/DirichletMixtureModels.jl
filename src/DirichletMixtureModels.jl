@@ -46,6 +46,7 @@ module DirichletMixtureModels
 
         dp_cluster,
         summarize,
+        export_states,
         pdf_likelihood,
         sample_posterior,
         marginal_likelihood,
