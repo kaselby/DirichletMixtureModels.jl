@@ -1,6 +1,5 @@
 abstract type AbstractMixtureModel end
 abstract type ConjugateModel <: AbstractMixtureModel end
-abstract type NonConjugateModel <: AbstractMixtureModel end
 
 
 """

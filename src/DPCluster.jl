@@ -42,6 +42,37 @@ function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters
   return states
 end
 
+function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; m_prior::Int64=3, m_post::Int64=3, iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
+  # Initialize the array of states
+  states = Array{DMMState, 1}(iters-burnin)
+
+  # Initialize the clusters, returning c and phi
+  state::DMMState = DMMState(Y,model)
+
+  # Iterate
+  for i in 1:iters
+    # Iterate through all Y and update
+    state = sample_Y(state, model, α, m_prior)
+
+    # Iterate through all ϕ and update
+    for k in keys(state.ϕ)
+      state.ϕ[k] = sample_posterior(model,get_data(state.data,state.Y[k]), m_post)
+    end
+
+    # Add to the list of states
+    if i > burnin
+      states[i-burnin] = state
+    end
+  end
+  # Shuffle the states so they may be treated as approximately IID samples
+  if shuffled
+    states = shuffle!(states)
+  end
+  return states
+end
+
+
+
 #
 # Iterate over all data points in the state, drawing a new cluster for each.
 # Returns a new state object.
