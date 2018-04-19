@@ -42,6 +42,7 @@ module DirichletMixtureModels
         UnivariateNormalModel,
         MultivariateNormalModel,
         DMMState,
+        OutputState,
 
         dp_cluster,
         summarize,
@@ -53,6 +54,7 @@ module DirichletMixtureModels
 
     include("./package_overrides.jl")
     include("./model.jl")
+    include("./models/nonconjugate_model.jl")
     include("./models/general_model.jl")
     include("./models/uv_normal.jl")
     include("./models/mv_normal.jl")

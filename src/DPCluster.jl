@@ -42,7 +42,7 @@ function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters
   return states
 end
 
-function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; m_prior::Int64=3, m_post::Int64=3, iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
+function dp_cluster(Y::Array{Float64}, model::NonConjugateModel, α::Float64; m_prior::Int64=3, m_post::Int64=3, iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
   # Initialize the array of states
   states = Array{DMMState, 1}(iters-burnin)
 
@@ -117,7 +117,8 @@ function sample_Y(state::DMMState, model::NonConjugateModel, α::Float64, m::Int
                   aux[i] = sample_prior(model)
               end
           end
-      _sample_y!(nextstate, state.Y[k][j], aux, model, α, m, N, K, L)
+          _sample_y!(nextstate, state.Y[k][j], aux, model, α, m, N, K, L)
+      end
   end
   cleanup!(nextstate)
   return nextstate

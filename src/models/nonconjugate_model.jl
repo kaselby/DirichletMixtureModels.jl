@@ -5,11 +5,11 @@ struct NonConjugateModel <: AbstractMixtureModel
     params::Tuple
 end
 
-function GeneralNonConjugateModel(pdf_l::Function, s_prior::Function, params::Tuple)
-    GeneralNonConjugateModel(pdf_l, s_prior, Nullable{Function}(), params)
+function NonConjugateModel(pdf_l::Function, s_prior::Function, params::Tuple)
+    NonConjugateModel(pdf_l, s_prior, Nullable{Function}(), params)
 end
-function GeneralNonConjugateModel(pdf_l::Function, s_prior::Function, s_post::Function, params::Tuple)
-    GeneralNonConjugateModel(pdf_l, s_prior, Nullable{Function}(s_post), params)
+function NonConjugateModel(pdf_l::Function, s_prior::Function, s_post::Function, params::Tuple)
+    NonConjugateModel(pdf_l, s_prior, Nullable{Function}(s_post), params)
 end
 
 function pdf_likelihood(model::NonConjugateModel, y::Array{Float64,1}, θ::Tuple)
