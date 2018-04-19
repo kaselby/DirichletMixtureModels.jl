@@ -55,13 +55,13 @@ This is the base type for the model with `Normal` likelihood and `NormalGamma`
 prior. This is the most commonly used 1D model.
 
 ```julia
-UnivariateNormalModel(prior)    # Creates a model with a given NormalGamma prior
-UnivariateNormalModel(ss)       # Creates a model with prior mean μ0,
-                                  # prior variance σ0 and fixed likelihood
-                                  # variance σ
-UnivariateNormalModel()           # Creates a model with prior hyper-
-                                  # -parameters inferred from the data
-                                  # using a NormalStats object
+UnivariateNormalModel(prior)          # Creates a model with a given NormalGamma prior.
+UnivariateNormalModel(μ0, n0, α0, β0) # Creates a model with the given hyperparameters
+                                      # (using shape/rate parametrization)
+UnivariateNormalModel(ss)             # Creates a model with prior mean inferred from the
+                                      # data using a NormalStats object and default values elsewhere.
+UnivariateNormalModel()               # Creates a model with default hyperparameters
+                                      # (0, 1e-8, 2, 0.5)
 ```
 """
 struct UnivariateNormalModel <: UnivariateConjugateModel

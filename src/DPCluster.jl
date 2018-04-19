@@ -37,7 +37,7 @@ function _dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64, iter
 
     # Iterate through all ϕ and update
     for k in keys(state.ϕ)
-      state.ϕ[k] = sample_posterior(model,state.Y[k])
+      state.ϕ[k] = sample_posterior(model,get_data(state.data,state.Y[k]))
     end
 
     # Add to the list of states
@@ -63,19 +63,18 @@ Iterates through each data point in the given `DMMState` object, drawing a new
 cluster for each.
 Returns a new state object.
 """
-function sample_Y(state, model, α) end
-
-function sample_Y(state::DMMState, model::UnivariateConjugateModel, α::Float64)
+function sample_Y(state::DMMState, model::ConjugateModel, α::Float64)
   N=sum(values(state.n))
-  nextstate = DMMState(state.ϕ,state.n)
+  nextstate = DMMState(state)
 
   for k in keys(state.Y)
-    for y in state.Y[k]
+    for j in state.Y[k]
+      yj = get_data(state.data, j)
       nextstate.n[k] -= 1
       K = collect(keys(nextstate.n))
 
-      q=[pdf_likelihood(model,y,nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
-      r=marginal_likelihood(model,y)*α/(N-1+α)
+      q=[pdf_likelihood(model,yj,nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
+      r=marginal_likelihood(model,yj)*α/(N-1+α)
       b= 1/(r+sum(q))
       r *= b
       q *= b
@@ -83,54 +82,13 @@ function sample_Y(state::DMMState, model::UnivariateConjugateModel, α::Float64)
       rd=rand()
       p=r
       if rd < p
-        ϕk = sample_posterior(model,y)
-        addnew!(nextstate, y, ϕk)
+        ϕk = sample_posterior(model,yj)
+        addnew!(nextstate, j, ϕk)
       else
         for i in 1:length(K)
           p += q[i]
           if rd < p
-            addto!(nextstate, y, K[i])
-            break
-          end
-        end
-      end
-    end
-  end
-  cleanup!(nextstate)
-  return nextstate
-end
-
-function sample_Y(state::DMMState, model::MultivariateConjugateModel, α::Float64)
-  N=sum(values(state.n))
-  nextstate = DMMState(state.ϕ,state.n)
-
-  for k in keys(state.Y)
-    Yk = state.Y[k]
-    for j in 1:size(Yk, 2)
-      yj = Yk[:,j:j]
-      nextstate.n[k] -= 1
-      K = collect(keys(nextstate.n))
-
-      q=[pdf_likelihood(model,yj[:,1],nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
-      r=marginal_likelihood(model,yj[:,1])*α/(N-1+α)
-
-      rbase = r
-      qbase = q
-
-      b= 1/(r+sum(q))
-      r *= b
-      q *= b
-
-      rd=rand()
-      p=r
-      if rd < p
-        ϕk = sample_posterior(model,yj[:,1])
-        addnew!(nextstate, yj, ϕk)
-      else
-        for i in 1:length(K)
-          p += q[i]
-          if rd < p
-            addto!(nextstate, yj, K[i])
+            addto!(nextstate, j, K[i])
             break
           end
         end

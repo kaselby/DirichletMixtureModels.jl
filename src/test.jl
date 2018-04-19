@@ -57,6 +57,9 @@ end
 
 srand(1010)
 
+#Univariate Test Code
+u_params = [(0.0,0.5), (0.5, 0.1)]
+u_data = generateSamples(Normal, u_params, [100,100])
 
 #   Multivariate Test Code
 T1 = [2. 1.; 1. 2.]
@@ -64,14 +67,18 @@ T2 = [4. 0.5; 0.5 1.]
 μ1 = [5.,0.]
 μ2 = [0.,-5.]
 
-params = [(μ1, T1), (μ2, T2)]
-data = generateSamples(MvNormal, params, [100, 100], 2)
+m_params = [(μ1, T1), (μ2, T2)]
+m_data = generateSamples(MvNormal, m_params, [100, 100], 2)
 
 α=1.0
 
-ss = suffstats(MvNormal, data)
-U = MultivariateNormalModel(ss)
-s = dp_cluster(data,U,1.0,iters=300)
+u_stats = suffstats(Normal, u_data)
+u_model = UnivariateNormalModel(u_stats)
+u_states = dp_cluster(u_data,u_model,1.0,iters=300)
+
+m_stats = suffstats(MvNormal, m_data)
+m_model = MultivariateNormalModel(m_stats)
+m_states = dp_cluster(m_data,m_model,1.0,iters=300)
 
 
 #=

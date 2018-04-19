@@ -38,8 +38,9 @@ DMMState(Y, model)    # Randomly initializes a state from a given dataset and
 ```
 """
 struct DMMState
+  data::AbstractArray{Float64}
   ϕ::Dict{Int64,Tuple}
-  Y::Dict{Int64,AbstractArray{Float64}}
+  Y::Dict{Int64,Array{Int64,1}}
   n::Dict{Int64,Int64}
 end
 
@@ -48,38 +49,38 @@ end
 # or create a new state from unlabelled data
 #
 
-function DMMState()
-  return DMMState(Dict{Int64,Tuple}(),Dict{Int64,Array{Float64}}(),
+function DMMState(data::AbstractArray{Float64})
+  return DMMState(data, Dict{Int64,Tuple}(),Dict{Int64,Array{Float64}}(),
                     Dict{Int64,Int64}())
 end
 
-function DMMState(ϕ::Dict{Int64,Tuple}, n::Dict{Int64,Int64})
-  return DMMState(ϕ,Dict{Int64,Array{Float64}}(), n)
+function DMMState(s::DMMState)
+  return DMMState(s.data, s.ϕ,Dict{Int64,Array{Float64}}(), s.n)
 end
 
-function DMMState(Y::Array{Float64,1}, model::UnivariateConjugateModel)
-  N=length(Y)
+function DMMState(data::Array{Float64,1}, model::UnivariateConjugateModel)
+  N=length(data)
   ϕ=Dict{Int64,Tuple}()
-  Ynew=Dict{Int64,Array{Float64,1}}()
+  Y=Dict{Int64,Array{Int64,1}}()
   n=Dict{Int64,Int64}()
   for i in 1:N
-    ϕ[i] = sample_posterior(model,Y[i])
-    Ynew[i] = [Y[i]]
+    ϕ[i] = sample_posterior(model,data[i])
+    Y[i] = [i]
     n[i] = 1
   end
-  return DMMState(ϕ,Ynew,n)
+  return DMMState(data,ϕ,Y,n)
 end
-function DMMState(Y::Array{Float64,2}, model::MultivariateConjugateModel)
-  d,N=size(Y)
-  ϕ=Dict{Int64,Tuple{AbstractVector,AbstractMatrix}}()
-  Ynew=Dict{Int64,Array{Float64,2}}()
+function DMMState(data::Array{Float64,2}, model::MultivariateConjugateModel)
+  d,N=size(data)
+  ϕ=Dict{Int64,Tuple}()
+  Y=Dict{Int64,Array{Int64,1}}()
   n=Dict{Int64,Int64}()
   for i in 1:N
-    ϕ[i] = sample_posterior(model,Y[:,i:i])
-    Ynew[i] = Y[:, i:i]
+    ϕ[i] = sample_posterior(model,data[:,i:i])
+    Y[i] = [i]
     n[i] = 1
   end
-  return DMMState(ϕ,Ynew,n)
+  return DMMState(data,ϕ,Y,n)
 end
 
 #
@@ -125,26 +126,15 @@ Assumes the label is not known.
 """
 function addnew!(state, y, ϕ) end
 
-function addnew!(state::DMMState, yi::Float64, ϕi::Tuple)
+function addnew!(state::DMMState, j::Int64, ϕj::Tuple)
   i = 1
   K = keys(state.n)
   while i in K
     i += 1
   end
-  state.Y[i] = [yi]
+  state.Y[i] = [j]
   state.n[i] = 1
-  state.ϕ[i] = ϕi
-  return i
-end
-function addnew!(state::DMMState, yi::Array{Float64,2}, ϕi::Tuple)
-  i = 1
-  K = keys(state.n)
-  while i in K
-    i += 1
-  end
-  state.Y[i] = yi
-  state.n[i] = 1
-  state.ϕ[i] = ϕi
+  state.ϕ[i] = ϕj
   return i
 end
 
@@ -153,19 +143,12 @@ end
 #
 
 """
-    addnew!(state, y, ϕ, i)
-Adds a new cluster to a `DMMState` object, with initial data `y`, parameters `ϕ`, and
-label `i`.
+    addnew!(state, j, ϕ, i)
+Adds a new cluster to a `DMMState` object, with initial data label `j`, parameters `ϕ`, and
+cluster label `i`.
 """
-function addnew!(state, y, ϕ, i) end
-
-function addnew!(state::DMMState, yi::Float64, ϕi::Tuple, i::Int64)
-  state.Y[i] = [yi]
-  state.n[i] = 1
-  state.ϕ[i] = ϕi
-end
-function addnew!(state::DMMState, yi::Array{Float64,2}, ϕi::Tuple, i::Int64)
-  state.Y[i] = yi
+function addnew!(state::DMMState, j::Int64, ϕi::Tuple, i::Int64)
+  state.Y[i] = [j]
   state.n[i] = 1
   state.ϕ[i] = ϕi
 end
@@ -175,31 +158,31 @@ end
 #
 
 """
-    addto!(state, y, i)
-Adds a new data point to an existing cluster of a `DMMState` object.
+    addto!(state, j, i)
+Adds a new data point with label `j` to the `i`th existing cluster of a `DMMState` object.
 """
-function addto!(state, y, i) end
+function addto!(state::DMMState, j::Int64, i::Int64)
+  @assert i in keys(state.ϕ)
+  @assert i in keys(state.n)
+  state.n[i]+=1
+  if i in keys(state.Y)
+    append!(state.Y[i], j)
+  else
+    state.Y[i] = [j]
+  end
+end
 
-function addto!(state::DMMState, yi::Float64, i::Int64)
-  @assert i in keys(state.ϕ)
-  @assert i in keys(state.n)
-  state.n[i]+=1
-  if i in keys(state.Y)
-    append!(state.Y[i], yi)
-  else
-    state.Y[i] = [yi]
-  end
-end
-function addto!(state::DMMState, yi::Array{Float64, 2}, i::Int64)
-  @assert i in keys(state.ϕ)
-  @assert i in keys(state.n)
-  state.n[i]+=1
-  if i in keys(state.Y)
-    state.Y[i] = [state.Y[i] yi]
-  else
-    state.Y[i] = yi
-  end
-end
+"""
+  get_data(Y, I)
+Assembles data points from `Y` indexed by `I`, where Y can be a vector or matrix
+and I can be a single index or an indexing set.
+"""
+function get_data(Y, I) end
+
+get_data(Y::Array{Float64, 1}, I::Union{Int64, Array{Int64,1}})=Y[I]
+get_data(Y::Array{Float64,2}, I::Union{Int64, Array{Int64,1}})=Y[:,I]
+
+
 
 #
 # Clean up state by removing empty clusters. Y is assumed to already be accurate.
@@ -283,4 +266,51 @@ function isequalϵ(a::Tuple, b::Tuple, ϵ=1e-6)
     end
   end
   return true
+end
+
+"""
+  OutputState(data, labels, ϕ, n)
+Alternative data structure to store the state of the cluster in a more user-friendly
+form. `data` is the original dataset provided to the algorithm, `labels` are cluster
+labels for each original data point (in order), `ϕ` holds the cluster parameters, and
+`n` holds the cluster sizes.
+
+```julia
+OutputState(state)    #Creates an output state from an existing DMMState
+```
+"""
+struct OutputState
+  data::AbstractArray{Float64}
+  labels::Array{Int64,1}
+  phi::Array{Tuple, 1}
+  n::Array{Int64,1}
+end
+
+function OutputState(s::DMMState)
+  N=size(s.data)[end]
+  K=keys(s.n)
+  m=length(K)
+  labels=Array{Int64,1}(N)
+  ϕ=Array{Tuple,1}(m)
+  n=Array{Int64,1}(m)
+  for i in 1:m
+    k=K[i]
+    ϕ[i]=s.ϕ[k]
+    n[i]=s.n[k]
+    labels[s.Y[k]]=i
+  end
+  OutputState(s.data, labels, ϕ, n)
+end
+
+"""
+  export_states(states)
+Creates a list of `OutputState` objects from a list of `DMMState` objects.
+"""
+function export_states(s::Array{DMMState,1})
+  M=length(s)
+  states=Array{OutputState, 1}
+  for j in 1:M
+    states[j] = OutputState(s[j])
+  end
+  states
 end

@@ -1,8 +1,27 @@
+"""
+    MultivariateNormalModel(prior)
+This is the base type for the model with `MvNormal` likelihood and `NormalWishart`
+prior. This is the most commonly used multivariate model.
 
+```julia
+MultivariateNormalModel(prior)          # Creates a model with a given NormalGamma prior.
+MultivariateNormalModel(μ0, κ0, T0, ν0) # Creates a model with the given hyperparameters
+MultivariateNormalModel(ss)             # Creates a model with prior mean and prior covariance
+                                        # inferred from the data using an MvNormalStats object
+                                        # and default values elsewhere.
+MultivariateNormalModel(d)              # Creates a model with dimension d and default
+                                        # hyperparameters (zeros(d), 1e-8, eye(d), d)
+MultivariateNormalModel()               # Creates a model with dimension 2 and default
+                                        # hyperparameters (zeros(2), 1e-8, eye(2), 2.0)
+```
+"""
 struct MultivariateNormalModel <: MultivariateConjugateModel
   prior::NormalWishart
 end
 
+function MultivariateNormalModel(μ0::Array{Float64,1}, κ0::Float64, T0::Array{Float64,2}, ν0::Float64)
+  MultivariateNormalModel(NormalWishart(μ0, κ0, T0, ν0))
+end
 function MultivariateNormalModel(ss::MvNormalStats)
   p=NormalWishart(ss.m, 1e-8, ss.s2/ss.tw, Float64(length(ss.m)))
   MultivariateNormalModel(p)
