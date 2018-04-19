@@ -15,7 +15,7 @@ MultivariateNormalModel()               # Creates a model with dimension 2 and d
                                         # hyperparameters (zeros(2), 1e-8, eye(2), 2.0)
 ```
 """
-struct MultivariateNormalModel <: MultivariateConjugateModel
+struct MultivariateNormalModel <: ConjugateModel
   prior::NormalWishart
 end
 

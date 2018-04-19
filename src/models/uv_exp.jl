@@ -1,5 +1,5 @@
 
-struct UnivariateExponentialModel <: UnivariateConjugateModel
+struct UnivariateExponentialModel <: ConjugateModel
   prior::Gamma
 end
 

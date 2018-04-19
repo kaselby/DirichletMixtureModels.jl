@@ -14,7 +14,7 @@ UnivariateNormalKnownSigma(ss, σ)       # Creates a model with prior hyper-
                                         # using a NormalStats object
 ```
 """
-struct UnivariateNormalKnownSigma <: UnivariateConjugateModel
+struct UnivariateNormalKnownSigma <: ConjugateModel
   prior::Normal
   σ::Float64
 end
@@ -64,7 +64,7 @@ UnivariateNormalModel()               # Creates a model with default hyperparame
                                       # (0, 1e-8, 2, 0.5)
 ```
 """
-struct UnivariateNormalModel <: UnivariateConjugateModel
+struct UnivariateNormalModel <: ConjugateModel
   prior::NormalGamma
 end
 

@@ -13,17 +13,7 @@ posterior.
 To see a formatted summary of all the clusters in a given state, call
 `summarize(model, state)`, where state is any entry from the outputted list.
 """
-function dp_cluster(Y, model, α; iters=5000, burnin=200, shuffled=true) end
-
-# Methods (to enforce proper typing)
-function dp_cluster(Y::Array{Float64,1}, model::UnivariateConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
-  _dp_cluster(Y, model, α, iters, burnin, shuffled)
-end
-function dp_cluster(Y::Array{Float64,2}, model::MultivariateConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
-  _dp_cluster(Y, model, α, iters, burnin, shuffled)
-end
-
-function _dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64, iters::Int64, burnin::Int64, shuffled::Bool)
+function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
   # Initialize the array of states
   states = Array{DMMState, 1}(iters-burnin)
 
@@ -64,37 +54,67 @@ cluster for each.
 Returns a new state object.
 """
 function sample_Y(state::DMMState, model::ConjugateModel, α::Float64)
-  N=sum(values(state.n))
   nextstate = DMMState(state)
+  N=sum(values(state.n))
+  K = collect(keys(nextstate.n))
 
   for k in keys(state.Y)
     for j in state.Y[k]
-      yj = get_data(state.data, j)
       nextstate.n[k] -= 1
-      K = collect(keys(nextstate.n))
-
-      q=[pdf_likelihood(model,yj,nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
-      r=marginal_likelihood(model,yj)*α/(N-1+α)
-      b= 1/(r+sum(q))
-      r *= b
-      q *= b
-
-      rd=rand()
-      p=r
-      if rd < p
-        ϕk = sample_posterior(model,yj)
-        addnew!(nextstate, j, ϕk)
-      else
-        for i in 1:length(K)
-          p += q[i]
-          if rd < p
-            addto!(nextstate, j, K[i])
-            break
-          end
-        end
-      end
+      _sample_y(j, nextstate, model, α, N, K)
     end
   end
   cleanup!(nextstate)
   return nextstate
+end
+
+function sampleY(state::DMMState, model::NonConjugateModel, α::Float64, m::Int64)
+  N=sum(values(state.n))
+  K=keys(state.n)
+  nextstate = DMMState(state)
+
+  aux=Array{Tuple}(m)
+  for (k,v) in state.n
+    if v == 1
+      nextstate.n[k] -= 1
+      y=get_data(state.data, j)
+      aux[1] = s.ϕ[k]
+      for i=2:m
+        aux[i] = sample_prior(model)
+      end
+      qprev=[pdf_likelihood(model, y, nextstate.ϕ[k])*nextstate.n[k]/(N-1+α) for k in K]
+      qaux=[pdf_likelihood(model, y, θ)*α/m/(N-1+α) for θ in aux]
+
+    else
+      for i=1:m
+        aux[i] = sample_prior(model)
+      end
+    end
+  end
+  return nextstate
+end
+
+function _sample_y(j::Int64, nextstate::DMMState, model::ConjugateModel, α::Float64, N::Int64, K::Array{Int64,1})
+  yj = get_data(nextstate.data, j)
+
+  q=[pdf_likelihood(model,yj,nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
+  r=marginal_likelihood(model,yj)*α/(N-1+α)
+  b= 1/(r+sum(q))
+  r *= b
+  q *= b
+
+  rd=rand()
+  p=r
+  if rd < p
+    ϕk = sample_posterior(model,yj)
+    addnew!(nextstate, j, ϕk)
+  else
+    for i in 1:length(K)
+      p += q[i]
+      if rd < p
+        addto!(nextstate, j, K[i])
+        break
+      end
+    end
+  end
 end

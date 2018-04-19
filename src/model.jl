@@ -1,7 +1,6 @@
 abstract type AbstractMixtureModel end
 abstract type ConjugateModel <: AbstractMixtureModel end
-abstract type UnivariateConjugateModel <: ConjugateModel end
-abstract type MultivariateConjugateModel <: ConjugateModel end
+abstract type NonConjugateModel <: AbstractMixtureModel end
 
 
 """
@@ -32,3 +31,10 @@ is an optional method that is used solely for formatting the output of the MCMC.
 function to_string(model::AbstractMixtureModel, ϕ::Tuple)
     return string(ϕ)
 end
+
+
+"""
+    sample_prior(model)
+Replaces sample_posterior for non-conjugate models. Returns a sample from the prior.
+"""
+function sample_prior(model) end

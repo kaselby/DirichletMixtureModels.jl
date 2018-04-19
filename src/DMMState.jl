@@ -58,7 +58,7 @@ function DMMState(s::DMMState)
   return DMMState(s.data, s.ϕ,Dict{Int64,Array{Float64}}(), s.n)
 end
 
-function DMMState(data::Array{Float64,1}, model::UnivariateConjugateModel)
+function DMMState(data::Array{Float64,1}, model::ConjugateModel)
   N=length(data)
   ϕ=Dict{Int64,Tuple}()
   Y=Dict{Int64,Array{Int64,1}}()
@@ -70,7 +70,7 @@ function DMMState(data::Array{Float64,1}, model::UnivariateConjugateModel)
   end
   return DMMState(data,ϕ,Y,n)
 end
-function DMMState(data::Array{Float64,2}, model::MultivariateConjugateModel)
+function DMMState(data::Array{Float64,2}, model::ConjugateModel)
   d,N=size(data)
   ϕ=Dict{Int64,Tuple}()
   Y=Dict{Int64,Array{Int64,1}}()
@@ -288,7 +288,7 @@ end
 
 function OutputState(s::DMMState)
   N=size(s.data)[end]
-  K=keys(s.n)
+  K=collect(keys(s.n))
   m=length(K)
   labels=Array{Int64,1}(N)
   ϕ=Array{Tuple,1}(m)

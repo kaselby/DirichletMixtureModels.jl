@@ -4,7 +4,7 @@
 
 # A struct to define the base type for your model (note, this can be empty if
 # needed, its primary purpose is for dispatch)
-struct MyModel <: UnivariateConjugateModel  #or MultivariateConjugateModel as appropriate
+struct MyModel <: ConjugateModel
 
 end
 
