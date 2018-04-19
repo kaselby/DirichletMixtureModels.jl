@@ -50,7 +50,9 @@ module DirichletMixtureModels
         pdf_likelihood,
         sample_posterior,
         marginal_likelihood,
-        to_string
+        standard_form,
+        parameter_names,
+        benchmark
 
 
     include("./package_overrides.jl")
@@ -62,5 +64,6 @@ module DirichletMixtureModels
     include("./models/uv_exp.jl")
     include("./DMMState.jl")
     include("./DPCluster.jl")
+    include("./benchmark.jl")
 
 end # module

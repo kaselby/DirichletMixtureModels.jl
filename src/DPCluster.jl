@@ -23,11 +23,11 @@ function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters
   # Iterate
   for i in 1:iters
     # Iterate through all Y and update
-    state = sample_Y(state,model,α)
+    state = sample_Y(state,model,α,Y)
 
     # Iterate through all ϕ and update
     for k in keys(state.ϕ)
-      state.ϕ[k] = sample_posterior(model,get_data(state.data,state.Y[k]))
+      state.ϕ[k] = sample_posterior(model,get_data(Y,state.Y[k]))
     end
 
     # Add to the list of states
@@ -39,8 +39,59 @@ function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters
   if shuffled
     states = shuffle!(states)
   end
-  export_states(model, states)
+  states
 end
+
+#
+# Iterate over all data points in the state, drawing a new cluster for each.
+# Returns a new state object.
+#
+
+"""
+  sample_Y(state, model, α)
+Iterates through each data point in the given `DMMState` object, drawing a new
+cluster for each.
+Returns a new state object.
+"""
+function sample_Y(state::DMMState, model::ConjugateModel, α::Float64, data::Array{Float64})
+  nextstate = DMMState(state)
+  N = sum(values(state.n))
+  for k in keys(state.Y)
+    for j in state.Y[k]
+      nextstate.n[k] -= 1
+      yj = get_data(data, j)
+      _sample_y!(nextstate, yj, j, model, α, N)
+    end
+  end
+  cleanup!(nextstate)
+  return nextstate
+end
+function _sample_y!(nextstate::DMMState, yj::Union{Float64, Array{Float64,1}}, j::Int64, model::ConjugateModel, α::Float64, N::Int64)
+  K= collect(keys(nextstate.n))
+  q=[pdf_likelihood(model,yj,nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
+  r=marginal_likelihood(model,yj)*α/(N-1+α)
+  b= r+sum(q)
+  r /= b
+  q /= b
+
+  rd=rand()
+  p=r
+  if rd < p
+    ϕk = sample_posterior(model,yj)
+    addnew!(nextstate, j, ϕk)
+  else
+    for i in 1:length(K)
+      p += q[i]
+      if rd < p
+        addto!(nextstate, j, K[i])
+        break
+      end
+    end
+  end
+end
+
+
+
 
 function dp_cluster(Y::Array{Float64}, model::NonConjugateModel, α::Float64; m_prior::Int64=3, m_post::Int64=3, iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
   # Initialize the array of states
@@ -68,42 +119,13 @@ function dp_cluster(Y::Array{Float64}, model::NonConjugateModel, α::Float64; m_
   if shuffled
     states = shuffle!(states)
   end
-  export_states(model, states)
+  states
 end
-
-
-
-#
-# Iterate over all data points in the state, drawing a new cluster for each.
-# Returns a new state object.
-#
-
-"""
-  sample_Y(state, model, α)
-Iterates through each data point in the given `DMMState` object, drawing a new
-cluster for each.
-Returns a new state object.
-"""
-function sample_Y(state::DMMState, model::ConjugateModel, α::Float64)
-  nextstate = DMMState(state)
-  N=sum(values(state.n))
-  K = collect(keys(nextstate.n))
-
-  for k in keys(state.Y)
-    for j in state.Y[k]
-      nextstate.n[k] -= 1
-      _sample_y!(j, nextstate, model, α, N, K)
-    end
-  end
-  cleanup!(nextstate)
-  return nextstate
-end
-
 
 function sample_Y(state::DMMState, model::NonConjugateModel, α::Float64, m::Int64)
   N=sum(values(state.n))
   K=collect(keys(state.n))
-  L = length(K)
+  L=length(K)
   nextstate = DMMState(state)
 
   aux=Array{Tuple}(m)
@@ -123,32 +145,6 @@ function sample_Y(state::DMMState, model::NonConjugateModel, α::Float64, m::Int
   cleanup!(nextstate)
   return nextstate
 end
-
-function _sample_y!(j::Int64, nextstate::DMMState, model::ConjugateModel, α::Float64, N::Int64, K::Array{Int64,1})
-  yj = get_data(nextstate.data, j)
-
-  q=[pdf_likelihood(model,yj,nextstate.ϕ[i])*nextstate.n[i]/(N-1+α) for i in K]
-  r=marginal_likelihood(model,yj)*α/(N-1+α)
-  b= 1/(r+sum(q))
-  r *= b
-  q *= b
-
-  rd=rand()
-  p=r
-  if rd < p
-    ϕk = sample_posterior(model,yj)
-    addnew!(nextstate, j, ϕk)
-  else
-    for i in 1:length(K)
-      p += q[i]
-      if rd < p
-        addto!(nextstate, j, K[i])
-        break
-      end
-    end
-  end
-end
-
 function _sample_y!(nextstate::DMMState, j::Int64, aux::Array{Tuple}, model::NonConjugateModel, α::Float64, m::Int64, N::Int64, K::Array{Int64,1}, L::Int64)
     y=get_data(state.data, j)
 
@@ -160,7 +156,7 @@ function _sample_y!(nextstate::DMMState, j::Int64, aux::Array{Tuple}, model::Non
     q_aux = q_aux/b
 
     rd=rand()
-    p=0
+    p=0.0
     for i in 1:(L+m)
         if i <= L
             p += q_prev[i]

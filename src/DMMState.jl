@@ -38,7 +38,6 @@ DMMState(Y, model)    # Randomly initializes a state from a given dataset and
 ```
 """
 struct DMMState
-  data::AbstractArray{Float64}
   ϕ::Dict{Int64,Tuple}
   Y::Dict{Int64,Array{Int64,1}}
   n::Dict{Int64,Int64}
@@ -49,13 +48,13 @@ end
 # or create a new state from unlabelled data
 #
 
-function DMMState(data::AbstractArray{Float64})
-  return DMMState(data, Dict{Int64,Tuple}(),Dict{Int64,Array{Float64}}(),
+function DMMState()
+  return DMMState(Dict{Int64,Tuple}(),Dict{Int64,Array{Int64,1}}(),
                     Dict{Int64,Int64}())
 end
 
 function DMMState(s::DMMState)
-  return DMMState(s.data, s.ϕ,Dict{Int64,Array{Float64}}(), s.n)
+  return DMMState(copy(s.ϕ), Dict{Int64,Array{Int64,1}}(), copy(s.n))
 end
 
 function DMMState(data::Array{Float64}, model::ConjugateModel)
@@ -68,7 +67,7 @@ function DMMState(data::Array{Float64}, model::ConjugateModel)
     Y[i] = [i]
     n[i] = 1
   end
-  return DMMState(data,ϕ,Y,n)
+  return DMMState(ϕ,Y,n)
 end
 
 """
@@ -78,8 +77,10 @@ and I can be a single index or an indexing set.
 """
 function get_data(Y, I) end
 
-get_data(Y::Array{Float64, 1}, I::Union{Int64, Array{Int64,1}})=Y[I]
-get_data(Y::Array{Float64,2}, I::Union{Int64, Array{Int64,1}})=Y[:,I]
+get_data(Y::Array{Float64, 1}, I::Array{Int64,1})=Y[I]
+get_data(Y::Array{Float64,2}, I::Array{Int64,1})=Y[:,I]
+get_data(Y::Array{Float64, 1}, i::Int64)=Y[i]
+get_data(Y::Array{Float64, 2}, i::Int64)=Y[:,i]
 
 
 #
@@ -248,8 +249,8 @@ struct OutputState
   n::Array{Int64,1}
 end
 
-function OutputState(model::AbstractMixtureModel, s::DMMState)
-  N=size(s.data)[end]
+function OutputState(data::Array{Float64}, model::AbstractMixtureModel, s::DMMState)
+  N=size(data)[end]
   K=collect(keys(s.n))
   m=length(K)
   labels=Array{Int64,1}(N)
@@ -261,18 +262,23 @@ function OutputState(model::AbstractMixtureModel, s::DMMState)
     n[i]=s.n[k]
     labels[s.Y[k]]=i
   end
-  OutputState(s.data, labels, ϕ, n)
+  OutputState(data, labels, ϕ, n)
 end
 
 """
   export_states(states)
 Creates a list of `OutputState` objects from a list of `DMMState` objects.
 """
-function export_states(model::AbstractMixtureModel, s::Array{DMMState,1})
+function export_states(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
   M=length(s)
   states=Array{OutputState, 1}(M)
   for j in 1:M
-    states[j] = OutputState(model, s[j])
+    try
+      states[j] = OutputState(data, model, s[j])
+    catch
+      println("Error at: ",j,"\n")
+      rethrow()
+    end
   end
   states
 end
