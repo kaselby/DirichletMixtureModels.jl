@@ -36,8 +36,8 @@ module DirichletMixtureModels
     export
         AbstractMixtureModel,
         ConjugateModel,
-        UnivariateConjugateModel,
-        MultivariateConjugateModel,
+        GeneralConjugateModel,
+        NonConjugateModel,
         UnivariateExponentialModel,
         UnivariateNormalKnownSigma,
         UnivariateNormalModel,
@@ -52,6 +52,7 @@ module DirichletMixtureModels
         export_all_r,
         pdf_likelihood,
         sample_posterior,
+        sample_prior,
         marginal_likelihood,
         standard_form,
         parameter_names,

@@ -3,16 +3,25 @@
 #
 
 struct GeneralConjugateModel <: ConjugateModel
-    marginal_likelihood::Function
     pdf_likelihood::Function
     sample_posterior::Function
+    marginal_likelihood::Function
     params::Tuple
 end
 
 function pdf_likelihood(model::GeneralConjugateModel, y::Float64, θ::Tuple)
-    model.pdf_likelihood(y, θ..., model. params...)
+    model.pdf_likelihood(y, θ..., model.params...)
 end
-function sample_posterior(model::GeneralConjugateModel, y::Union{Float64, Array{Float64,1}, Array{Float64, 2}})
+function pdf_likelihood(model::GeneralConjugateModel, y::Array{Float64,1}, θ::Tuple)
+    model.pdf_likelihood(y, θ..., model.params...)
+end
+function sample_posterior(model::GeneralConjugateModel, y::Float64)
+    model.sample_posterior(y, model.params...)
+end
+function sample_posterior(model::GeneralConjugateModel, y::Array{Float64,1})
+    model.sample_posterior(y, model.params...)
+end
+function sample_posterior(model::GeneralConjugateModel, y::Array{Float64, 2})
     model.sample_posterior(y, model.params...)
 end
 function marginal_likelihood(model::GeneralConjugateModel, y::Float64)

@@ -63,7 +63,19 @@ function DMMState(data::Array{Float64}, model::ConjugateModel)
   Y=Dict{Int64,Array{Int64,1}}()
   n=Dict{Int64,Int64}()
   for i in 1:N
-    ϕ[i] = sample_posterior(model,get_data(data,[i]))
+    ϕ[i] = sample_posterior(model,get_data(data,i))
+    Y[i] = [i]
+    n[i] = 1
+  end
+  return DMMState(ϕ,Y,n)
+end
+function DMMState(data::Array{Float64}, model::NonConjugateModel, m::Int64)
+  N=size(data)[end]
+  ϕ=Dict{Int64,Tuple}()
+  Y=Dict{Int64,Array{Int64,1}}()
+  n=Dict{Int64,Int64}()
+  for i in 1:N
+    ϕ[i] = sample_posterior(model,get_data(data,i),m)
     Y[i] = [i]
     n[i] = 1
   end
