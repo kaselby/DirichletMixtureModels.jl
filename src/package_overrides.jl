@@ -1,3 +1,5 @@
+#Redefining several methods from ConjugatePriors until it gets updated
+
 function rand(nw::NormalWishart)
     Lam = rand(Wishart(nw.nu, nw.Tchol))
     Lsym = PDMat(Symmetric(inv(Lam) ./ nw.kappa))

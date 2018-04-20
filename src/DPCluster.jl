@@ -39,7 +39,7 @@ function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters
   if shuffled
     states = shuffle!(states)
   end
-  export_states(model, states)
+  export_states(data, model, states)
 end
 
 #
