@@ -277,3 +277,50 @@ function export_states(data::Array{Float64}, model::AbstractMixtureModel, s::Arr
   end
   states
 end
+
+
+function export_r(data::Array{Float64,1}, model::AbstractMixtureModel, s::DMMState)
+  N=length(data)
+  K=collect(keys(s.n))
+  m=length(K)
+
+  labelled_data=zeros(Float64,2,N)
+  phi=Array{Tuple,1}(m)
+  n=Array{Int64,1}(m)
+  for i in 1:m
+    k=K[i]
+    phi[i]=standard_form(model, s.ϕ[k])
+    n[i]=s.n[k]
+    J=s.Y[k]
+    labelled_data[1,J]=i
+    labelled_data[2,J]=data[J]
+  end
+  [transpose(labelled_data), phi, n]
+end
+function export_r(data::Array{Float64,2}, model::AbstractMixtureModel, s::DMMState)
+  d,N=size(data)
+  K=collect(keys(s.n))
+  m=length(K)
+
+  labelled_data=zeros(Float64,d+1,N)
+  phi=Array{Array,1}(m)
+  n=Array{Int64,1}(m)
+  for i in 1:m
+    k=K[i]
+    phi[i]=collect(standard_form(model, s.ϕ[k]))
+    n[i]=s.n[k]
+    J=s.Y[k]
+    labelled_data[1,J]=i
+    labelled_data[2:end,J]=data[:,J]
+  end
+  [transpose(labelled_data), phi, n]
+end
+
+function export_all_r(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
+  M=length(s)
+  states=Array{Array, 1}(M)
+  for j in 1:M
+    states[j] = export_r(data,model,s[j])
+  end
+  states
+end
