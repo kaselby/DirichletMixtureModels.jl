@@ -273,12 +273,7 @@ function export_states(data::Array{Float64}, model::AbstractMixtureModel, s::Arr
   M=length(s)
   states=Array{OutputState, 1}(M)
   for j in 1:M
-    try
-      states[j] = OutputState(data, model, s[j])
-    catch
-      println("Error at: ",j,"\n")
-      rethrow()
-    end
+    states[j] = OutputState(data, model, s[j])
   end
   states
 end
