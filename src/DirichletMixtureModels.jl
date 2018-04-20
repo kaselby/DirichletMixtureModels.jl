@@ -1,5 +1,6 @@
 module DirichletMixtureModels
 
+    using Suppressor
     using Distributions
     using ConjugatePriors
     using PDMats
