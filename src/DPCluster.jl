@@ -13,7 +13,7 @@ post-burnin iteration, with the default being a burnin of 500. By default, this
 array is shuffled so that it may be used to approximate I.I.D draws from the
 posterior.
 """
-function dp_cluster(Y, model, α, iters=5000,burnin=500, shuffled=true)
+function dp_cluster(Y, model, α, iters=5000,burnin=500, shuffled=true) end
 
 """
   sample_Y(state, data, model, α)
@@ -22,7 +22,7 @@ Iterates through each data point in the given `DMMState` object, drawing a new
 cluster for each.
 Returns a new state object. Used in dp_cluster to perform the Gibbs update on Y.
 """
-function sample_Y(state, data, model, α)
+function sample_Y(state, data, model, α) end
 
 """
   sample_ϕ(state, data, model, α, m)
@@ -31,7 +31,7 @@ for each.
 Returns a new state object. Used in dp_cluster in the non-conjugate case to perform
 the Gibbs update on ϕ.
 """
-function sample_ϕ(state, data, model, α)
+function sample_ϕ(state, data, model, α) end
 
 
 function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=500, shuffled::Bool=true)

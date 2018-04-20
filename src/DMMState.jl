@@ -297,11 +297,11 @@ function export_r(data::Array{Float64,1}, model::AbstractMixtureModel, s::DMMSta
   m=length(K)
 
   labelled_data=zeros(Float64,2,N)
-  phi=Array{Tuple,1}(m)
+  phi=Array{Array,1}(m)
   n=Array{Int64,1}(m)
   for i in 1:m
     k=K[i]
-    phi[i]=standard_form(model, s.ϕ[k])
+    phi[i]=collect(standard_form(model, s.ϕ[k]))
     n[i]=s.n[k]
     J=s.Y[k]
     labelled_data[1,J]=i
@@ -328,7 +328,7 @@ function export_r(data::Array{Float64,2}, model::AbstractMixtureModel, s::DMMSta
   [transpose(labelled_data), phi, n]
 end
 
-function export_all_r(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
+function export_r_all(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
   M=length(s)
   states=Array{Array, 1}(M)
   for j in 1:M

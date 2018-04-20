@@ -49,7 +49,7 @@ module DirichletMixtureModels
         summarize,
         export_states,
         export_r,
-        export_all_r,
+        export_r_all,
         pdf_likelihood,
         sample_posterior,
         sample_prior,
