@@ -22,6 +22,10 @@ end
 function UnivariateNormalKnownSigma(μ0::Float64, σ0::Float64, σ::Float64)
   UnivariateNormalKnownSigma(Normal(μ0, σ0), σ)
 end
+function UnivariateNormalKnownSigma(Y::Array{Float64,1}, σ::Float64)
+  ss=suffstats(Normal, Y)
+  UnivariateNormalKnownSigma(ss, σ)
+end
 function UnivariateNormalKnownSigma(ss::NormalStats, σ::Float64)
   p=Normal(ss.m,ss.s2/ss.tw)
   UnivariateNormalKnownSigma(p, σ)
@@ -75,6 +79,10 @@ end
 
 function UnivariateNormalModel(μ0::Float64, n0::Float64, α0::Float64, β0::Float64)
   UnivariateNormalModel(NormalGamma(μ0, n0, α0, β0))
+end
+function UnivariateNormalModel(Y::Array{Float64,1})
+  ss=suffstats(Normal, Y)
+  UnivariateNormalModel(ss)
 end
 function UnivariateNormalModel(ss::NormalStats)
   p=NormalGamma(ss.m,1e-8,2.0,0.5)

@@ -22,17 +22,21 @@ end
 function MultivariateNormalModel(μ0::Array{Float64,1}, κ0::Float64, T0::Array{Float64,2}, ν0::Float64)
   MultivariateNormalModel(NormalWishart(μ0, κ0, T0, ν0))
 end
+function MultivariateNormalModel(Y::Array{Float64,2})
+  ss=suffstats(MvNormal, Y)
+  MultivariateNormalModel(ss)
+end
 function MultivariateNormalModel(ss::MvNormalStats)
-  p=NormalWishart(ss.m, 1e-8, ss.s2/ss.tw, Float64(length(ss.m)))
+  p=NormalWishart(ss.m, 0.1, ss.s2/ss.tw, Float64(length(ss.m)))
   MultivariateNormalModel(p)
 end
 function MultivariateNormalModel(d::Int64)
-  p=NormalWishart(zeros(d), 1.0, eye(d), d*1.0)
+  p=NormalWishart(zeros(d), 1e-8, eye(d), d*1.0)
   MultivariateNormalModel(p)
 end
 function MultivariateNormalModel()
   d=2
-  p=NormalWishart(zeros(d), 1.0, eye(d), d*1.0)
+  p=NormalWishart(zeros(d), 1e-8, eye(d), d*1.0)
   MultivariateNormalModel(p)
 end
 
