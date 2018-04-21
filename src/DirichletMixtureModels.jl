@@ -69,5 +69,5 @@ module DirichletMixtureModels
     include("./DMMState.jl")
     include("./DPCluster.jl")
     include("./benchmark.jl")
-
+    include("./test_functions.jl")
 end # module

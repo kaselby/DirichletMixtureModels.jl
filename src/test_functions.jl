@@ -1,14 +1,3 @@
-using DirichletMixtureModels
-using Distributions
-using ConjugatePriors
-
-importall DirichletMixtureModels
-importall Distributions
-import ConjugatePriors:
-    NormalGamma,
-    NormalWishart,
-    pdf,
-    posterior_canon
 
 function pdf_joint(model::ConjugateModel, y, θ)
     pdf(model.prior,θ...)*pdf_likelihood(model, y, θ)
