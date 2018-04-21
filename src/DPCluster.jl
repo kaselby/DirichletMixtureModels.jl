@@ -119,7 +119,7 @@ function dp_cluster(Y::Array{Float64}, model::NonConjugateModel, α::Float64; m_
     state = sample_Y(state, Y, model, α, m_prior)
 
     # Iterate through all ϕ and update
-    sample_ϕ!(state, model, m_post, Y)
+    sample_ϕ!(state, Y, model, m_post)
 
     # Add to the list of states
     if i > burnin

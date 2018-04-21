@@ -27,7 +27,8 @@ function MultivariateNormalModel(Y::Array{Float64,2})
   MultivariateNormalModel(ss)
 end
 function MultivariateNormalModel(ss::MvNormalStats)
-  p=NormalWishart(ss.m, 0.1, ss.s2/ss.tw, Float64(length(ss.m)))
+  nu=Float64(length(ss.m))
+  p=NormalWishart(ss.m, 1e-8, ss.s2/ss.tw/nu, nu)
   MultivariateNormalModel(p)
 end
 function MultivariateNormalModel(d::Int64)
