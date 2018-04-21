@@ -2,6 +2,9 @@
 struct UnivariateExponentialModel <: ConjugateModel
   prior::Gamma
 end
+function UnivariateExponentialModel(α::Float64, θ::Float64)
+  UnivariateExponentialModel(Gamma(α,θ))
+end
 
 function pdf_likelihood(model::UnivariateExponentialModel, y::Float64, θ::Tuple{Float64})
   pdf(Exponential(θ[1]), y)

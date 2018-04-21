@@ -56,7 +56,7 @@ module DirichletMixtureModels
         marginal_likelihood,
         standard_form,
         parameter_names,
-        benchmark
+        dp_benchmark
 
 
     include("./package_overrides.jl")
