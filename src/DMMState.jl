@@ -75,7 +75,7 @@ function DMMState(data::Array{Float64}, model::NonConjugateModel, m::Int64)
   Y=Dict{Int64,Array{Int64,1}}()
   n=Dict{Int64,Int64}()
   for i in 1:N
-    ϕ[i] = sample_prior(model)
+    ϕ[i] = sample_posterior(model,get_data(Y,i),m)
     Y[i] = [i]
     n[i] = 1
   end

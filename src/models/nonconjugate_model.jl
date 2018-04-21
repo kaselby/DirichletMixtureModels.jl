@@ -27,3 +27,22 @@ end
 function sample_prior(model::NonConjugateModel)
     model.sample_prior(model.params...)
 end
+#note: can be unstable
+function sample_posterior(model::NonConjugateModel, y::Float64, m::Int64)
+    aux=Array{Tuple}(m)
+    for i=1:m
+      aux[i] = sample_prior(model)
+    end
+    q_aux=[pdf_likelihood(model, y, θ) for θ in aux]
+    b=sum(q_aux)
+    q_aux/=b
+
+    rd=rand()
+    p=0
+    for i in 1:m
+        p += q_aux[i]
+        if rd < p
+            return aux[i]
+        end
+    end
+end
