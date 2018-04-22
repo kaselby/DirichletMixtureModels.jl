@@ -22,13 +22,23 @@ function pdf_likelihood(model::NonConjugateModel, y::Float64, θ::Tuple)
     model.pdf_likelihood(y, θ..., model.params...)
 end
 function pdf_likelihood(model::NonConjugateModel, y::Array{Float64,1}, θ::Tuple)
-    prod(model.pdf_likelihood(y, θ..., model.params...))
+    model.pdf_likelihood(y, θ..., model.params...)
+end
+function pdf_likelihood(model::NonConjugateModel, y::Array{Float64,2}, θ::Tuple)
+    model.pdf_likelihood(y, θ..., model.params...)
 end
 function sample_prior(model::NonConjugateModel)
     model.sample_prior(model.params...)
 end
-#note: can be unstable
 function sample_posterior(model::NonConjugateModel, y::Float64, m::Int64)
+    _mc_sample_posterior(model, y, m)
+end
+function sample_posterior(model::NonConjugateModel, y::Array{Float64,1}, m::Int64)
+    _mc_sample_posterior(model, y, m)
+end
+
+#note: can be unstable - only pass one data point
+function _mc_sample_posterior(model::NonConjugateModel, y::Union{Float64,Array{Float64,1}}, m::Int64)
     aux=Array{Tuple}(m)
     for i=1:m
       aux[i] = sample_prior(model)

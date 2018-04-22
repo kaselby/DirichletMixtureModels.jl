@@ -196,8 +196,9 @@ function sample_ϕ!(state::DMMState, data::Array{Float64}, model::NonConjugateMo
   end
 end
 function _sample_ϕ(Y::Array{Float64}, aux::Array{Tuple}, model::NonConjugateModel, m::Int64)
-  q_aux=[pdf_likelihood(model, Y, θ) for θ in aux]
+  q_aux=[prod(pdf_likelihood(model, Y, θ)) for θ in aux]
   b=sum(q_aux)
+
   q_aux/=b
 
   rd=rand()
@@ -208,4 +209,6 @@ function _sample_ϕ(Y::Array{Float64}, aux::Array{Tuple}, model::NonConjugateMod
           return aux[i]
       end
   end
+  println("This shouldn't happen.")
+  println(q_aux)
 end
