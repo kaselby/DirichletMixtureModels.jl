@@ -27,3 +27,6 @@ end
 function marginal_likelihood(model::GeneralConjugateModel, y::Float64)
     model.marginal_likelihood(y, model.params...)
 end
+function marginal_likelihood(model::GeneralConjugateModel, y::Array{Float64,1})
+    model.marginal_likelihood(y, model.params...)
+end
