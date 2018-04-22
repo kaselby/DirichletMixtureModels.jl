@@ -43,11 +43,9 @@ module DirichletMixtureModels
         UnivariateNormalModel,
         MultivariateNormalModel,
         DMMState,
-        OutputState,
 
         dp_cluster,
         summarize,
-        export_states,
         export_r,
         export_r_all,
         pdf_likelihood,

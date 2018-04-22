@@ -75,7 +75,7 @@ function DMMState(data::Array{Float64}, model::NonConjugateModel, m::Int64)
   Y=Dict{Int64,Array{Int64,1}}()
   n=Dict{Int64,Int64}()
   for i in 1:N
-    ϕ[i] = sample_posterior(model,get_data(Y,i),m)
+    ϕ[i] = sample_posterior(model,get_data(data,i),m)
     Y[i] = [i]
     n[i] = 1
   end
@@ -241,53 +241,6 @@ function isequalϵ(a::Tuple, b::Tuple, ϵ=1e-6)
     end
   end
   return true
-end
-
-"""
-  OutputState(data, labels, ϕ, n)
-Alternative data structure to store the state of the cluster in a more user-friendly
-form. `data` is the original dataset provided to the algorithm, `labels` are cluster
-labels for each original data point (in order), `ϕ` holds the cluster parameters, and
-`n` holds the cluster sizes.
-
-```julia
-OutputState(state)    #Creates an output state from an existing DMMState
-```
-"""
-struct OutputState
-  data::AbstractArray{Float64}
-  labels::Array{Int64,1}
-  phi::Array{Tuple, 1}
-  n::Array{Int64,1}
-end
-
-function OutputState(data::Array{Float64}, model::AbstractMixtureModel, s::DMMState)
-  N=size(data)[end]
-  K=collect(keys(s.n))
-  m=length(K)
-  labels=Array{Int64,1}(N)
-  ϕ=Array{Tuple,1}(m)
-  n=Array{Int64,1}(m)
-  for i in 1:m
-    k=K[i]
-    ϕ[i]=standard_form(model, s.ϕ[k])
-    n[i]=s.n[k]
-    labels[s.Y[k]]=i
-  end
-  OutputState(data, labels, ϕ, n)
-end
-
-"""
-  export_states(states)
-Creates a list of `OutputState` objects from a list of `DMMState` objects.
-"""
-function export_states(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
-  M=length(s)
-  states=Array{OutputState, 1}(M)
-  for j in 1:M
-    states[j] = OutputState(data, model, s[j])
-  end
-  states
 end
 
 
