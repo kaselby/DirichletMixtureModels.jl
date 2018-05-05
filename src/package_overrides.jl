@@ -25,6 +25,7 @@
 
         return NormalWishart(mu, kappa, cholfact(Lam), nu)
     end
+
     pdf(nw::NormalWishart, x::Vector{T}, Lam::Matrix{S}) where T<:Real where S<:Real =
     exp(logpdf(nw, x, Lam))
     function logpdf(nw::NormalWishart, x::Vector{T}, Lam::Matrix{T}) where T<:Real
@@ -38,13 +39,14 @@
 
         # Normalization
         logp = hp*(log(kappa) - Float64(log(2*π)))
-        logp -= hnu * logdet(Tchol)
+        logp -= -hnu * logdet(Tchol)
         logp -= hnu * p * log(2.)
         logp -= logmvgamma(p, hnu)
 
-        T0 = Tchol[:U]'*Tchol[:U]
+
         # Wishart (MvNormal contributes 0.5 as well)
         logp += (hnu - hp) * logdet(Lam)
+        T0 = Tchol[:U]'*Tchol[:U]
         logp -= 0.5 * trace(T0 * Lam)
 
         # Normal
