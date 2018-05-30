@@ -1,10 +1,12 @@
 # DirichletMixtureModels
 
-This package provides utilities for clustering using Dirichlet Process mixture models in Julia. It supports a number of existing conjugate distribution pairs, as well as user-specified distributions.
+This package provides utilities for clustering using Dirichlet Process mixture models in Julia. It supports a number of existing conjugate distribution pairs, as well as user-specified distributions. Currently, the package supports conjugate models with the following likelihoods (as well as any user-defined models, conjugate or non-conjugate):
+* Univariate Normal
+* Univariate Normal with Known Sigma
+* Univariate Exponential
+* Multivariate Normal
 
-Currently, the package only supports clustering using conjugate distributions using the methods in Markov Chain Sampling Methods for Dirichlet Process Mixture Models by Radford Neal. Clustering using non-conjugate distributions is under active development.
-
-There will also be an R package linked to this for using these utilities from R. Information on that will be added shortly.
+The package supports clustering using conjugate distributions using the methods in Markov Chain Sampling Methods for Dirichlet Process Mixture Models by Radford Neal. Clustering using non-conjugate distributions is also supported using Neal's Algorithm 8, but this is still in the early stages.
 
 ## Getting Started
 ### Prerequisites
