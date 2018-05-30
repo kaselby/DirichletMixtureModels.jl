@@ -13,7 +13,7 @@ post-burnin iteration, with the default being a burnin of 500. By default, this
 array is shuffled so that it may be used to approximate I.I.D draws from the
 posterior.
 """
-function dp_cluster(Y, model, α, iters=5000,burnin=500, shuffled=true) end
+function dp_cluster(Y, model, α=1.0, iters=1000,burnin=500, shuffled=true) end
 
 """
   sample_Y(state, data, model, α)
@@ -34,7 +34,7 @@ the Gibbs update on ϕ.
 function sample_ϕ(state, data, model, α) end
 
 
-function dp_cluster(Y::Array{Float64}, model::ConjugateModel, α::Float64; iters::Int64=5000, burnin::Int64=500, shuffled::Bool=true)
+function dp_cluster(Y::Array{Float64}, model::ConjugateModel; α::Float64=1.0, iters::Int64=1000, burnin::Int64=500, shuffled::Bool=true)
   # Initialize the array of states
   states = Array{DMMState, 1}(iters-burnin)
 
