@@ -185,12 +185,9 @@ function addto!(state::DMMState, j::Int64, i::Int64)
 end
 
 
-#
-# Clean up state by removing empty clusters. Y is assumed to already be accurate.
-#
 """
     cleanup!(state)
-Removes all empty clusters from a `DMMState` object.
+Removes all empty clusters from a `DMMState` object. Y is assumed to be accurate.
 """
 function cleanup!(state::DMMState)
   for (k,v) in state.n
@@ -244,7 +241,10 @@ function isequalϵ(a::Tuple, b::Tuple, ϵ=1e-6)
 end
 
 
-function export_r(data::Array{Float64,1}, model::AbstractMixtureModel, s::DMMState)
+#
+# Export the contents of the state
+#
+function export_state(data::Array{Float64,1}, model::AbstractMixtureModel, s::DMMState)
   N=length(data)
   K=collect(keys(s.n))
   m=length(K)
@@ -262,7 +262,7 @@ function export_r(data::Array{Float64,1}, model::AbstractMixtureModel, s::DMMSta
   end
   [transpose(labelled_data), phi, n]
 end
-function export_r(data::Array{Float64,2}, model::AbstractMixtureModel, s::DMMState)
+function export_state(data::Array{Float64,2}, model::AbstractMixtureModel, s::DMMState)
   d,N=size(data)
   K=collect(keys(s.n))
   m=length(K)
@@ -281,11 +281,11 @@ function export_r(data::Array{Float64,2}, model::AbstractMixtureModel, s::DMMSta
   [transpose(labelled_data), phi, n]
 end
 
-function export_r_all(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
+function export_all(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
   M=length(s)
   states=Array{Array, 1}(M)
   for j in 1:M
-    states[j] = export_r(data,model,s[j])
+    states[j] = export_state(data,model,s[j])
   end
   states
 end
