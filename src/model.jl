@@ -45,3 +45,7 @@ end
 Replaces sample_posterior for non-conjugate models. Returns a sample from the prior.
 """
 function sample_prior(model) end
+
+function sample_prior(model::ConjugateModel)
+    rand(model.prior)
+end
