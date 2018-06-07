@@ -41,17 +41,9 @@
         logp -= hnu * p * log(2.)
         logp -= logmvgamma(p, hnu)
 
-<<<<<<< HEAD
-
-        # Wishart (MvNormal contributes 0.5 as well)
-        logp += (hnu - hp) * logdet(Lam)
-        T0 = Tchol[:U]'*Tchol[:U]
-        logp -= 0.5 * trace(T0 * Lam)
-=======
         # Wishart (MvNormal contributes 0.5 as well)
         logp += (hnu - hp) * logdet(Lam)
         logp -= 0.5 * trace(Tchol \ Lam)
->>>>>>> parent of db4a533... Reparametrized NW prior for MVN
 
         # Normal
         z = nw.zeromean ? x : x - mu
