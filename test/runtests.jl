@@ -18,10 +18,10 @@ function test_model(model, y, θ)
     marginal_likelihood(model, y) - (pdf_joint(model, y, θ) / pdf_posterior(model, y, θ))
 end
 
-TOL = 1e-15
+TOL = 1e-8
 
-N_θ = 3
-N_y = 3
+N_θ = 10
+N_y = 10
 
 data_1d = randn(N_y)
 data_2d = randn(2,N_y)
