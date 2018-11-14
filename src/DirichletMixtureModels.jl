@@ -1,6 +1,6 @@
 module DirichletMixtureModels
 
-    using Suppressor
+    #using Suppressor
     using Distributions
     using ConjugatePriors
     using PDMats
@@ -27,7 +27,7 @@ module DirichletMixtureModels
 
     import ConjugatePriors:
         NormalGamma,
-        NormalWishart,
+        NormalInverseWishart,
         rand,
         pdf,
         logpdf,
@@ -57,7 +57,7 @@ module DirichletMixtureModels
         dp_benchmark
 
 
-    include("./package_overrides.jl")
+    #include("./package_overrides.jl")
     include("./model.jl")
     include("./models/nonconjugate_model.jl")
     include("./models/general_model.jl")
