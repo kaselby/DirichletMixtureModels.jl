@@ -65,7 +65,7 @@ function marginal_likelihood(model::MultivariateNormalModel, y::Array{Float64,1}
   nu = nu0 + 1
   mu = (kappa0.*mu0 + y) ./ kappa
 
-  Lam0 = LamC0[:U]'*LamC0[:U]
+  Lam0 = LamC0.L*LamC0.U
   z = p.zeromean ? y : y - mu0
   Lam = Lam0 + kappa0/kappa*(z*z')
 
