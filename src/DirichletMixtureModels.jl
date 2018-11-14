@@ -5,10 +5,12 @@ module DirichletMixtureModels
     using ConjugatePriors
     using PDMats
     using Random
-
-    import PDMats: PDMat
+    using LinearAlgebra
 
     import Random: shuffle, shuffle!
+    import LinearAlgebra: Symmetric
+
+    import PDMats: PDMat
 
     import Distributions:
         Distribution,
