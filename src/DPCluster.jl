@@ -36,7 +36,7 @@ function sample_ϕ(state, data, model, α) end
 
 function dp_cluster(Y::Array{Float64}, model::ConjugateModel; α::Float64=1.0, iters::Int64=1000, burnin::Int64=500, shuffled::Bool=true)
   # Initialize the array of states
-  states = Array{DMMState, 1}(iters-burnin)
+  states = Array{DMMState, 1}(undef, iters-burnin)
 
   # Initialize the clusters, returning c and phi
   state::DMMState = DMMState(Y,model)
@@ -108,7 +108,7 @@ end
 
 function dp_cluster(Y::Array{Float64}, model::NonConjugateModel, α::Float64; m_prior::Int64=2, m_post::Int64=5, iters::Int64=5000, burnin::Int64=200, shuffled::Bool=true)
   # Initialize the array of states
-  states = Array{DMMState, 1}(iters-burnin)
+  states = Array{DMMState, 1}(undef, iters-burnin)
 
   # Initialize the clusters, returning c and phi
   state::DMMState = DMMState(Y,model,m_post)
@@ -137,7 +137,7 @@ function sample_Y(state::DMMState, data::Array{Float64}, model::NonConjugateMode
   N=sum(values(state.n))
   nextstate = DMMState(state)
 
-  aux=Array{Tuple}(m)
+  aux=Array{Tuple}(undef, m)
   for k in keys(state.Y)
       for j in state.Y[k]
           nextstate.n[k] -= 1
