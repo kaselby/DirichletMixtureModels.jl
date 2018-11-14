@@ -1,4 +1,5 @@
 
+
 function pdf_joint(model::ConjugateModel, y, θ)
     pdf(model.prior,θ...)*pdf_likelihood(model, y, θ)
 end
@@ -16,7 +17,7 @@ function pdf_posterior(model::UnivariateExponentialModel, y, θ)
     pdf(posterior_canon(model.prior,suffstats(Exponential, [y])), θ...)
 end
 
-function generateSamples(::Type{T}, thetas::AbstractVector, numSamples::Array{Int64,1}; shuffled=true) where T <: UnivariateDistribution
+function generate_samples(::Type{T}, thetas::AbstractVector, numSamples::Array{Int64,1}; shuffled=true) where T <: UnivariateDistribution
     @assert length(thetas) == length(numSamples)
     M=length(thetas)
     N=sum(numSamples)
@@ -35,7 +36,7 @@ function generateSamples(::Type{T}, thetas::AbstractVector, numSamples::Array{In
     end
     return data
 end
-function generateSamples(::Type{T}, thetas::AbstractVector, numSamples::Array{Int64,1}, d::Int64; shuffled=true) where T <: MultivariateDistribution
+function generate_samples(::Type{T}, thetas::AbstractVector, numSamples::Array{Int64,1}, d::Int64; shuffled=true) where T <: MultivariateDistribution
     @assert length(thetas) == length(numSamples)
     M=length(thetas)
     N=sum(numSamples)

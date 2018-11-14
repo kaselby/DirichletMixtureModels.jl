@@ -4,8 +4,11 @@ module DirichletMixtureModels
     using Distributions
     using ConjugatePriors
     using PDMats
+    using Random
 
     import PDMats: PDMat
+
+    import Random: shuffle, shuffle!
 
     import Distributions:
         Distribution,
