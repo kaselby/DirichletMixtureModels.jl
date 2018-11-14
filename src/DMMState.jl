@@ -274,8 +274,8 @@ function export_state(data::Array{Float64,1}, model::AbstractMixtureModel, s::DM
   m=length(K)
 
   labelled_data=zeros(Float64,2,N)
-  phi=Array{Array,1}(m)
-  n=Array{Int64,1}(m)
+  phi=Array{Array,1}(undef,m)
+  n=Array{Int64,1}(undef,m)
   for i in 1:m
     k=K[i]
     phi[i]=collect(standard_form(model, s.ϕ[k]))
@@ -292,8 +292,8 @@ function export_state(data::Array{Float64,2}, model::AbstractMixtureModel, s::DM
   m=length(K)
 
   labelled_data=zeros(Float64,d+1,N)
-  phi=Array{Array,1}(m)
-  n=Array{Int64,1}(m)
+  phi=Array{Array,1}(undef,m)
+  n=Array{Int64,1}(undef,m)
   for i in 1:m
     k=K[i]
     phi[i]=collect(standard_form(model, s.ϕ[k]))
@@ -307,7 +307,7 @@ end
 
 function export_all(data::Array{Float64}, model::AbstractMixtureModel, s::Array{DMMState,1})
   M=length(s)
-  states=Array{Array, 1}(M)
+  states=Array{Array, 1}(undef,M)
   for j in 1:M
     states[j] = export_state(data,model,s[j])
   end

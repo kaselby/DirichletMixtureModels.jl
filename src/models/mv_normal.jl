@@ -29,7 +29,7 @@ end
 function MultivariateNormalModel(ss::MvNormalStats)
   nu=Float64(length(ss.m))
   Ψ0=PDMat(Symmetric(inv(ss.s2/ss.tw/nu)))
-  p=NormalInverseWishart(ss.m, 1e-8, Ψ0, nu)
+  p=NormalInverseWishart(ss.m, 1e-8, cholesky(Ψ0), nu)
   MultivariateNormalModel(p)
 end
 function MultivariateNormalModel(d::Int64)
